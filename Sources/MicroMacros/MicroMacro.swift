@@ -78,10 +78,27 @@ public struct WithStoreModelMacro: PeerMacro {
     }
 }
 
+public struct WithStoreModelEmptyMacro: PeerMacro {
+    public static func expansion(
+        of node: AttributeSyntax,
+        providingPeersOf declaration: some DeclSyntaxProtocol,
+        in context: some MacroExpansionContext
+    ) throws -> [DeclSyntax] {
+        return [
+            """
+            struct UserEmpty {
+                let id: Int
+                let name: String
+            }
+            """
+        ]
+    }
+}
 @main
 struct MicroPlugin: CompilerPlugin {
     let providingMacros: [Macro.Type] = [
         StringifyMacro.self,
-        WithStoreModelMacro.self
+        WithStoreModelMacro.self,
+        WithStoreModelEmptyMacro.self
     ]
 }

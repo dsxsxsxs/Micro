@@ -12,3 +12,5 @@ public macro stringify<T>(_ value: T) -> (T, String) = #externalMacro(module: "M
 
 @attached(peer, names: suffixed(Model))
 public macro WithStoreModel() = #externalMacro(module: "MicroMacros", type: "WithStoreModelMacro")
+@attached(peer, names: suffixed(Empty))
+public macro WithStoreModelEmpty<T>(empty: () -> T) = #externalMacro(module: "MicroMacros", type: "WithStoreModelEmptyMacro")

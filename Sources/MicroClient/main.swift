@@ -12,7 +12,8 @@ enum Store {
 }
 
 // given
-@WithStoreModel
+//@WithStoreModel
+@WithStoreModelEmpty<User>(empty: { User(id: 0, name: "") })
 struct User {
     let id: Int
     let name: String
