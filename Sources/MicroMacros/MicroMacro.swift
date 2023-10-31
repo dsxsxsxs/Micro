@@ -25,6 +25,12 @@ public struct StringifyMacro: ExpressionMacro {
     }
 }
 
+struct Error: Swift.Error {
+    let message: String
+    init(_ message: String) {
+        self.message = message
+    }
+}
 public struct WithStoreModelMacro: PeerMacro {
     public static func expansion(
         of node: AttributeSyntax,
@@ -33,14 +39,38 @@ public struct WithStoreModelMacro: PeerMacro {
     ) throws -> [DeclSyntax] {
         print("😲", node.debugDescription)
         print("✅", declaration.debugDescription)
-        let modelDeclSyntax = DeclSyntax(stringLiteral: """
-        struct UserModel: Codable {
-            let id: Int
-            let name: String
 
+        guard let structDecl = declaration.as(StructDeclSyntax.self) else {
+            throw Error("[\(type(of: self))]: is not a struct")
+        }
+
+        guard let structDecl = declaration.as(StructDeclSyntax.self) else {
+            throw Error("[\(type(of: self))]: is not a struct")
+        }
+
+        let variableDeclMembers = structDecl.memberBlock.members.compactMap {
+            $0.decl.as(VariableDeclSyntax.self)
+        }
+
+        let variableNames = variableDeclMembers.compactMap {
+            $0.bindings.compactMap {
+                $0.pattern
+                    .as(IdentifierPatternSyntax.self)?
+                    .identifier
+                    .text
+            }
+        }
+            .flatMap { $0 }
+        print("✅", variableNames)
+
+        guard !variableDeclMembers.isEmpty else {
+            throw Error("[\(type(of: self))]: have no valid member")
+        }
+        let modelDeclSyntax = DeclSyntax(stringLiteral: """
+        struct \(structDecl.name.text)Model: Codable {
+            \(variableDeclMembers.map { $0.trimmedDescription }.joined(separator: "\n"))
             func save() {
-                Store.save(id)
-                Store.save(name)
+                \(variableNames.map { "Store.save(\($0))" }.joined(separator: "\n"))
             }
         }
         """)
