@@ -25,9 +25,33 @@ public struct StringifyMacro: ExpressionMacro {
     }
 }
 
+public struct WithStoreModelMacro: PeerMacro {
+    public static func expansion(
+        of node: AttributeSyntax,
+        providingPeersOf declaration: some DeclSyntaxProtocol,
+        in context: some MacroExpansionContext
+    ) throws -> [DeclSyntax] {
+        print("😲", node.debugDescription)
+        print("✅", declaration.debugDescription)
+        let modelDeclSyntax = DeclSyntax(stringLiteral: """
+        struct UserModel: Codable {
+            let id: Int
+            let name: String
+
+            func save() {
+                Store.save(id)
+                Store.save(name)
+            }
+        }
+        """)
+        return [modelDeclSyntax]
+    }
+}
+
 @main
 struct MicroPlugin: CompilerPlugin {
     let providingMacros: [Macro.Type] = [
         StringifyMacro.self,
+        WithStoreModelMacro.self
     ]
 }

@@ -12,6 +12,7 @@ enum Store {
 }
 
 // given
+@WithStoreModel
 struct User {
     let id: Int
     let name: String
@@ -25,7 +26,7 @@ struct User {
 //        let name: String
 //    }
 // }
-struct UserModel: Codable {
+struct User2Model: Codable {
     let id: Int
     let name: String
 

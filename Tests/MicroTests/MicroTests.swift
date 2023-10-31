@@ -8,10 +8,31 @@ import MicroMacros
 
 let testMacros: [String: Macro.Type] = [
     "stringify": StringifyMacro.self,
+    "WithStoreModel": WithStoreModelMacro.self
 ]
 #endif
 
 final class MicroTests: XCTestCase {
+
+    func testWithStoreMacro() {
+
+        #if canImport(MicroMacros)
+        assertMacroExpansion(
+            """
+            @WithStoreModel
+            struct User {
+                let id: Int
+                let name: String
+            }
+            """,
+            expandedSource: """
+            """,
+            macros: testMacros
+        )
+        #else
+        throw XCTSkip("macros are only supported when running tests for the host platform")
+        #endif
+    }
     func testMacro() throws {
         #if canImport(MicroMacros)
         assertMacroExpansion(
